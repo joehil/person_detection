@@ -9,6 +9,7 @@
 
 #define RF_DATA 9
 #define RF_VCC 8
+#define RF_GND 7
 
 AK975X movementSensor; //Hook object to the library
 RCSwitch mySwitch = RCSwitch();
@@ -53,11 +54,12 @@ void setup()
   pinMode(4, INPUT_PULLUP);
   pinMode(5, INPUT_PULLUP);
   pinMode(6, INPUT_PULLUP);
-  pinMode(7, INPUT_PULLUP);
+  pinMode(RF_GND, OUTPUT);
   pinMode(RF_VCC, OUTPUT); 
   pinMode(RF_DATA, OUTPUT); 
   
   digitalWrite(RF_VCC, LOW);
+  digitalWrite(RF_GND, LOW);
 
   pinMode(10, INPUT_PULLUP);
   pinMode(11, INPUT_PULLUP);
@@ -91,7 +93,11 @@ void loop()
     ir3 = movementSensor.getIR3();
     ir4 = movementSensor.getIR4();
 
-    irsum = ir1 + ir2 + ir3 + ir4 + 4000;
+    irsum = ir1;
+    if (ir2 > irsum) irsum = ir2;
+    if (ir3 > irsum) irsum = ir3;
+    if (ir4 > irsum) irsum = ir4;
+    irsum += 4000;
 
     movementSensor.refresh(); //Read dummy register after new data is read
 
